@@ -61,6 +61,12 @@
         button:hover {
             background-color: #e65b4f;
         }
+        #favoriteIcon {
+    font-size: 2rem;
+    margin-top: 10px;
+    cursor: pointer;
+    display: inline-block;
+}
     </style>
 </head>
 <body>
@@ -70,8 +76,11 @@
 <div class="content">
     <div class="quote" id="quote">Lade Zitat...</div>
     <div class="author" id="author">– Autor</div>
+    <span id="favoriteIcon"></span>
     <button onclick="showRandomQuote()">Inspirier mich!</button>
     <button onclick="shareQuote()">Zitat per WhatsApp teilen</button>
+    <button onclick="addToFavorites()">Als Favorit speichern</button>
+    <p><a href="#" onclick="showFavorites()">Meine Favoriten anzeigen</a></p>
 </div>
 
 <script>
@@ -210,6 +219,40 @@
     const whatsappUrl = `https://api.whatsapp.com/send?text= ${message}`;
     window.open(whatsappUrl, '_blank');
 }
+    function addToFavorites() {
+        function updateFavoriteIcon() {
+    const quoteText = document.getElementById("quote").textContent.trim();
+    const quoteAuthor = document.getElementById("author").textContent.trim();
+
+    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+    const isFavorite = favorites.some(fav => fav.quote === quoteText && fav.author === quoteAuthor);
+
+    const favoriteIcon = document.getElementById("favoriteIcon");
+
+    if (isFavorite) {
+        favoriteIcon.innerHTML = '❤️';
+    } else {
+        favoriteIcon.innerHTML = '♡';
+    }
+}
+        const quoteText = document.getElementById("quote").textContent;
+        const quoteAuthor = document.getElementById("author").textContent;
+
+        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+        const alreadySaved = favorites.some(fav => fav.quote === quoteText && fav.author === quoteAuthor);
+
+        if (alreadySaved) {
+            alert("Dieses Zitat ist bereits als Favorit gespeichert.");
+            return;
+        }
+
+        favorites.push({ quote: quoteText, author: quoteAuthor });
+        localStorage.setItem("favorites", JSON.stringify(favorites));
+
+        alert("Zitat wurde als Favorit gespeichert!");
+    }
 </script>
 
 </body>
