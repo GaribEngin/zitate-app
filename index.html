@@ -6,68 +6,67 @@
   <title>Inspirationszitate</title>
   <link href="https://fonts.googleapis.com/css2?family=Große+Vibes&display=swap" rel="stylesheet">
   <style>
+    
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: white;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    position: relative;
+  }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: Arial, sans-serif;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: white;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  position: relative;
-  transition: background-image 1s ease-in-out;
-}
+  .overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 0;
+    pointer-events: none;
+  }
 
+  .content {
+    position: relative;
+    z-index: 10;
+    max-width: 80%;
+  }
 
-        .overlay {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.4);
-            z-index: 0;
-          pointer-events: none;
-}
+  .quote {
+    font-size: 2.5rem;
+    font-family: 'Great Vibes', cursive;
+    margin-bottom: 1rem;
+  }
 
+  .author {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-top: 1rem;
+  }
 
-        .content {
-            position: relative;
-            z-index: 1;
-            max-width: 80%;
-        }
+  button {
+    margin: 1rem;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #ff6f61;
+    color: white;
+    transition: background-color 0.3s ease;
+  }
 
-        .quote {
-            font-size: 2.5rem;
-            font-family: 'Great Vibes', cursive;
-            margin-bottom: 1rem;
-        }
+  button:hover {
+    background-color: #e65b4f;
+  }
+</style>
 
-        .author {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-top: 1rem;
-        }
-
-        button {
-            margin-top: 2rem;
-            padding: 1rem 2rem;
-            font-size: 1.2rem;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            background-color: #ff6f61;
-            color: white;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #e65b4f;
-        }
-    </style>
 </head>
 <body>
   <div class="overlay"></div>
