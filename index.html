@@ -31,7 +31,7 @@
         .content {
             position: relative;
             z-index: 1;
-            max-width: 80%;
+            max-width: 90%;
         }
 
         .quote {
@@ -61,50 +61,67 @@
         button:hover {
             background-color: #e65b4f;
         }
+
         #favoriteIcon {
-    font-size: 2rem;
-    margin-top: 10px;
-    cursor: pointer;
-    display: inline-block;
-}
+            font-size: 2rem;
+            margin-left: 10px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
         /* Modal-Stile */
-.modal {
-    display: none; /* Standardmäßig versteckt */
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-}
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
 
-.modal-content {
-    background-color: #fefefe;
-    margin: 15% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 600px;
-    border-radius: 8px;
-}
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
 
-.close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-}
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
-</style>
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        #favoritesList {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #favoritesList li {
+            margin-bottom: 10px;
+        }
+
+        .button-large {
+            font-size: 1.4rem !important;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+        }
+    </style>
 </head>
 <body>
 
@@ -113,11 +130,21 @@
 <div class="content">
     <div class="quote" id="quote">Lade Zitat...</div>
     <div class="author" id="author">– Autor</div>
-    <span id="favoriteIcon"></span>
+    <span id="favoriteIcon"></span> <!-- Herzsymbol -->
     <button onclick="showRandomQuote()">Inspirier mich!</button>
     <button onclick="shareQuote()">Zitat per WhatsApp teilen</button>
-    <button onclick="addToFavorites()">Als Favorit speichern</button>
-    <p><a href="#" onclick="showFavorites()">Meine Favoriten anzeigen</a></p>
+    <button onclick="toggleFavorite()">Als Favorit speichern</button>
+    <button onclick="showFavorites()" class="button-large">Meine Favoriten anzeigen</button>
+</div>
+
+<!-- Modal für Favoriten -->
+<div id="favoritesModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Meine Lieblingszitate</h2>
+        <ul id="favoritesList"></ul>
+        <button onclick="closeModal()" style="background:#ff6f61; color:white; padding:10px 20px; border:none; border-radius:5px; font-size:1rem;">Zurück zur App</button>
+    </div>
 </div>
 
 <script>
@@ -126,7 +153,7 @@
         ["Wer nicht wagt, gewinnt nichts.", "Leonardo da Vinci"],
         ["Der einzige Weg, etwas Großes zu erreichen, ist zu glauben, dass man es kann.", "Charles Kingsleigh"],
         ["Leben ist wie Fahrradfahren. Um dein Gleichgewicht zu halten, musst du weiterfahren.", "Albert Einstein"],
-        ["Das Geheimnis des Lebens ist es, den Mut zu haben, jeden Tag neu zu beginnen.", "Charles Kingsleigh"],
+        ["Das Geheimnis des Lebens ist es, den Mut zu haben, jeden Tag neu zu beginnen.", "Charles Kingsleigh"]
         ["Träume nicht dein Leben, sondern lebe deinen Traum.", "Helen Keller"],
         ["Du wirst nie einen neuen Horizont erreichen, wenn du nicht den Mut hast, das Ufer zu verlassen.", "André Gide"],
         ["Sei du selbst die Veränderung, die du dir wünschst für diese Welt.", "Mahatma Gandhi"],
@@ -220,7 +247,7 @@
         ["Es gibt nichts Gutes, außer man tut es.", "Erich Fromm"],
         ["Die Antwort ist immer einfach, wenn man sie kennt.", "Agatha Christie"],
         ["Das Problem ist die Lösung.", "Georg Christoph Lichtenberg"],
-        ["Der Mensch ist mehr als das, was er ist.", "Abraham Maslow"]
+        ["Der Mensch ist mehr als das, was er ist.", "Abraham Maslow"
     ];
 
     function getRandomIndex(arrayLength) {
@@ -233,6 +260,7 @@
         const index = getRandomIndex(quotes.length);
         document.getElementById("quote").textContent = `"${quotes[index][0]}"`;
         document.getElementById("author").textContent = `– ${quotes[index][1]}`;
+        updateFavoriteIcon();
 
         // Wähle ein anderes Bild als vorher
         let imageIndex;
@@ -244,35 +272,22 @@
         document.body.style.backgroundImage = `url('images/${imageIndex + 1}.jpg')`;
     }
 
-    // Beim Laden der Seite sofort ein Zitat anzeigen
-    window.onload = showRandomQuote;
-    
+    window.onload = function () {
+        showRandomQuote();
+        updateFavoriteIcon();
+    };
+
     function shareQuote() {
-    const quoteText = document.getElementById("quote").textContent.trim();
-    const quoteAuthor = document.getElementById("author").textContent.trim();
+        const quoteText = document.getElementById("quote").textContent.trim();
+        const quoteAuthor = document.getElementById("author").textContent.trim();
 
-    const message = encodeURIComponent(`${quoteText}\n\n${quoteAuthor}\n\nTäglich neue Inspiration findest du hier:\nhttps://garibengin.github.io/zitate-app/ `);
+        const message = encodeURIComponent(`${quoteText}\n\n${quoteAuthor}\n\nTäglich neue Inspiration findest du hier:\nhttps://garibengin.github.io/zitate-app/ `);
 
-    const whatsappUrl = `https://api.whatsapp.com/send?text= ${message}`;
-    window.open(whatsappUrl, '_blank');
-}
-    function addToFavorites() {
-        function updateFavoriteIcon() {
-    const quoteText = document.getElementById("quote").textContent.trim();
-    const quoteAuthor = document.getElementById("author").textContent.trim();
-
-    let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
-
-    const isFavorite = favorites.some(fav => fav.quote === quoteText && fav.author === quoteAuthor);
-
-    const favoriteIcon = document.getElementById("favoriteIcon");
-
-    if (isFavorite) {
-        favoriteIcon.innerHTML = '❤️';
-    } else {
-        favoriteIcon.innerHTML = '♡';
+        const whatsappUrl = `https://api.whatsapp.com/send?text= ${message}`;
+        window.open(whatsappUrl, '_blank');
     }
-}
+
+    function toggleFavorite() {
         const quoteText = document.getElementById("quote").textContent;
         const quoteAuthor = document.getElementById("author").textContent;
 
@@ -281,24 +296,62 @@
         const alreadySaved = favorites.some(fav => fav.quote === quoteText && fav.author === quoteAuthor);
 
         if (alreadySaved) {
-            alert("Dieses Zitat ist bereits als Favorit gespeichert.");
-            return;
+            favorites = favorites.filter(fav => !(fav.quote === quoteText && fav.author === quoteAuthor));
+            alert("Zitat aus Favoriten entfernt.");
+        } else {
+            favorites.push({ quote: quoteText, author: quoteAuthor });
+            alert("Zitat als Favorit gespeichert!");
         }
 
-        favorites.push({ quote: quoteText, author: quoteAuthor });
         localStorage.setItem("favorites", JSON.stringify(favorites));
-
-        alert("Zitat wurde als Favorit gespeichert!");
+        updateFavoriteIcon();
     }
+
+    function updateFavoriteIcon() {
+        const quoteText = document.getElementById("quote").textContent.trim();
+        const quoteAuthor = document.getElementById("author").textContent.trim();
+
+        let favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+
+        const isFavorite = favorites.some(fav => fav.quote === quoteText && fav.author === quoteAuthor);
+
+        const favoriteIcon = document.getElementById("favoriteIcon");
+        favoriteIcon.innerHTML = isFavorite ? '❤️' : '♡';
+    }
+
+    function showFavorites() {
+        const favorites = JSON.parse(localStorage.getItem("favorites")) || [];
+        const favoritesList = document.getElementById("favoritesList");
+        const modal = document.getElementById("favoritesModal");
+
+        favoritesList.innerHTML = "";
+
+        if (favorites.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "Keine gespeicherten Zitate.";
+            favoritesList.appendChild(li);
+        } else {
+            favorites.forEach((fav, index) => {
+                const li = document.createElement("li");
+                li.textContent = `${index + 1}. ${fav.quote} – ${fav.author}`;
+                favoritesList.appendChild(li);
+            });
+        }
+
+        modal.style.display = "block";
+    }
+
+    function closeModal() {
+        document.getElementById("favoritesModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("favoritesModal");
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    };
 </script>
-    <!-- Modal für Favoriten -->
-<div id="favoritesModal" class="modal">
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2>Meine Favoriten</h2>
-        <ul id="favoritesList"></ul>
-    </div>
-</div>
 
 </body>
 </html>
